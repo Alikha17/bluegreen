@@ -1,5 +1,10 @@
 replicaCount: 2
 
 image:
-  repository: 113461832962.dkr.ecr.ap-south-1.amazonaws.com/bluegreenrepo # Replace with your ECR URI
+  repository: 113461832962.dkr.ecr.ap-south-1.amazonaws.com/bluegreenrepo
   tag: "latest"
+
+# Add this section below:
+service:
+  type: ClusterIP
+  port: 80
