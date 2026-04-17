@@ -1,0 +1,24 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: {{ include "my-helm-charts.fullname" . }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: my-app
+  template:
+    metadata:
+      labels:
+        app: my-app
+    spec:
+      containers:
+      - name: my-app
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        ports:
+          - containerPort: 5000
+  strategy:
+    blueGreen: 
+      activeService: {{ include "my-helm-charts.fullname" . }}-active
+      previewService: {{ include "my-helm-charts.fullname" . }}-preview
+      autoPromotionEnabled: false

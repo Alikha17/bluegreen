@@ -1,0 +1,5 @@
+replicaCount: 2
+
+image:
+  repository: 113461832962.dkr.ecr.ap-south-1.amazonaws.com/bluegreenrepo # Replace with your ECR URI
+  tag: "latest"
