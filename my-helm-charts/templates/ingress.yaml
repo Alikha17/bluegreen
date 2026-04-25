@@ -4,11 +4,14 @@ metadata:
   name: ingress
   namespace: default
   annotations:
-    alb.ingress.kubernetes.io/group.name: "chippy-shared-lb" # Essential for sharing one ALB
-    alb.ingress.kubernetes.io/scheme: internet-facing
-    alb.ingress.kubernetes.io/target-type: ip
-    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:ap-south-1:113461832962:certificate/60d2857a-1d9a-486d-b943-04d8586e170d
-    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS":443}]'
+  alb.ingress.kubernetes.io/group.name: "chippy-shared-lb"
+  alb.ingress.kubernetes.io/scheme: internet-facing
+  alb.ingress.kubernetes.io/target-type: ip
+  alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS":443}]'
+  alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:ap-south-1:113461832962:certificate/60d2857a-1d9a-486d-b943-04d8586e170d
+  # If your app doesn't have an SSL cert inside the container, use HTTP here
+  alb.ingress.kubernetes.io/backend-protocol: HTTP
+  alb.ingress.kubernetes.io/success-codes: "200-399"
 spec:
   ingressClassName: alb
   rules:

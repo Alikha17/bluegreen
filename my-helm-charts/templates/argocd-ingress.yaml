@@ -4,10 +4,16 @@ metadata:
   name: argocd-ingress
   namespace: argocd
   annotations:
-    alb.ingress.kubernetes.io/group.name: "chippy-shared-lb" # Must match exactly!
-    alb.ingress.kubernetes.io/scheme: internet-facing
-    alb.ingress.kubernetes.io/target-type: ip
-    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:ap-south-1:113461832962:certificate/60d2857a-1d9a-486d-b943-04d8586e170d
+  alb.ingress.kubernetes.io/group.name: "chippy-shared-lb"
+  alb.ingress.kubernetes.io/scheme: internet-facing
+  alb.ingress.kubernetes.io/target-type: ip
+  alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS":443}]'
+  alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:ap-south-1:113461832962:certificate/60d2857a-1d9a-486d-b943-04d8586e170d
+  # This tells the ALB to talk to ArgoCD via HTTPS
+  alb.ingress.kubernetes.io/backend-protocol: HTTPS
+  # This tells the ALB that 307 is a "Healthy" response
+  alb.ingress.kubernetes.io/success-codes: "200,301,302,307"
+  alb.ingress.kubernetes.io/healthcheck-protocol: HTTPS
 spec:
   ingressClassName: alb
   rules:
