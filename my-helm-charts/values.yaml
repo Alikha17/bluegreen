@@ -27,13 +27,6 @@ ingress:
         - path: /
           pathType: ImplementationSpecific
 
-# 4. Storage Settings (Fixes pvc.yaml / storageclass.yaml errors)
-persistence:
-  enabled: true
-  storageClass: "gp2"
-  accessMode: ReadWriteOnce
-  size: 8Gi
-
 # 5. Service Account Settings
 serviceAccount:
   create: true
@@ -48,3 +41,9 @@ httpRoute:
 resources: {}
 autoscaling:
   enabled: false
+
+persistence:
+  enabled: true
+  mountPath: /data
+  storageClass: ebs-sc
+  size: 1Gi

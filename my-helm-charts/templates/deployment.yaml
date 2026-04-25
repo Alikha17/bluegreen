@@ -21,3 +21,17 @@ spec:
             - name: http
               containerPort: 80
               protocol: TCP
+          # VolumeMounts must be indented under the container
+          {{- if .Values.persistence.enabled }}
+          volumeMounts:
+            - name: ebs-data
+              mountPath: {{ .Values.persistence.mountPath }}
+          {{- end }}
+      
+      # Volumes must be at the Pod spec level (same level as containers)
+      {{- if .Values.persistence.enabled }}
+      volumes:
+        - name: ebs-data
+          persistentVolumeClaim:
+            claimName: {{ include "my-helm-charts.fullname" . }}-ebs-pvc
+      {{- end }}
