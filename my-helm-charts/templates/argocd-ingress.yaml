@@ -1,24 +1,23 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: ingress
-  namespace: default
+  name: argocd-ingress
+  namespace: argocd
   annotations:
-    alb.ingress.kubernetes.io/group.name: "chippy-shared-lb" # Essential for sharing one ALB
+    alb.ingress.kubernetes.io/group.name: "chippy-shared-lb" # Must match exactly!
     alb.ingress.kubernetes.io/scheme: internet-facing
     alb.ingress.kubernetes.io/target-type: ip
     alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:ap-south-1:113461832962:certificate/60d2857a-1d9a-486d-b943-04d8586e170d
-    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS":443}]'
 spec:
   ingressClassName: alb
   rules:
-    - host: chippy123.shop
+    - host: argocd.chippy123.shop
       http:
         paths:
           - path: /
             pathType: Prefix
             backend:
               service:
-                name: bluegreen-active # Points to your Blue-Green app
+                name: argocd-server
                 port:
                   number: 80

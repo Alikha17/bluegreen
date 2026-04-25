@@ -1,0 +1,35 @@
+apiVersion: argoproj.io/v1alpha1 # Special API for Rollouts
+kind: Rollout
+metadata:
+  name: {{ include "my-helm-charts.fullname" . }}
+spec:
+  replicas: 2
+  revisionHistoryLimit: 2
+  selector:
+    matchLabels:
+      app: {{ include "my-helm-charts.name" . }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "my-helm-charts.name" . }}
+    spec:
+      containers:
+      - name: {{ .Chart.Name }}
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        ports:
+        - containerPort: 80
+        # Don't forget your PVC mount from earlier!
+        volumeMounts:
+        - name: storage-volume
+          mountPath: /data
+      volumes:
+      - name: storage-volume
+        persistentVolumeClaim:
+          claimName: bluegreen-my-helm-charts-ebs-pvc
+
+  # THE STRATEGY BLOCK
+  strategy:
+    blueGreen: 
+      activeService: bluegreen-active
+      previewService: bluegreen-preview
+      autoPromotionEnabled: false # This pauses the rollout so YOU can click 'Promote'

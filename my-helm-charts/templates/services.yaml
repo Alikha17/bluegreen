@@ -1,21 +1,27 @@
+# 1. The Active Service (Live Traffic)
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "my-helm-charts.fullname" . }}-active
+  name: bluegreen-active
 spec:
+  type: ClusterIP
+  selector:
+    # Note: Argo Rollouts will automatically add an additional 
+    # 'rollouts-pod-template-hash' label here during a swap.
+    app: {{ include "my-helm-charts.name" . }}
   ports:
     - port: 80
-      targetPort: 5000
-  selector:
-    app: my-app
+      targetPort: 80
 ---
+# 2. The Preview Service (Testing Traffic)
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "my-helm-charts.fullname" . }}-preview
+  name: bluegreen-preview
 spec:
+  type: ClusterIP
+  selector:
+    app: {{ include "my-helm-charts.name" . }}
   ports:
     - port: 80
-      targetPort: 5000
-  selector:
-    app: my-app
+      targetPort: 80

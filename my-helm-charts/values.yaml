@@ -14,18 +14,24 @@ service:
   type: ClusterIP
   port: 80
 
-# 3. Ingress Settings (Fixes the ingress.yaml error)
+# 3. Ingress Settings (Updated for chippy123.shop)
 ingress:
   enabled: true
   className: "alb"
   annotations:
+    # This MUST match the group name in your ArgoCD ingress later
+    alb.ingress.kubernetes.io/group.name: "chippy-prod-alb"
     alb.ingress.kubernetes.io/scheme: internet-facing
     alb.ingress.kubernetes.io/target-type: ip
+    # Replace with your actual ACM ARN
+    alb.ingress.kubernetes.io/certificate-arn: "arn:aws:acm:ap-south-1:113461832962:certificate/60d2857a-1d9a-486d-b943-04d8586e170d"
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS":443}]'
+    alb.ingress.kubernetes.io/ssl-redirect: '443'
   hosts:
-    - host: chart-example.local
+    - host: chippy123.shop
       paths:
         - path: /
-          pathType: ImplementationSpecific
+          pathType: Prefix
 
 # 5. Service Account Settings
 serviceAccount:
