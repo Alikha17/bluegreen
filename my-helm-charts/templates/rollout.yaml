@@ -1,9 +1,9 @@
-apiVersion: argoproj.io/v1alpha1 # Special API for Rollouts
+apiVersion: argoproj.io/v1alpha1
 kind: Rollout
 metadata:
   name: {{ include "my-helm-charts.fullname" . }}
 spec:
-  replicas: 2
+  replicas: {{ .Values.replicaCount }}
   revisionHistoryLimit: 2
   selector:
     matchLabels:
@@ -16,20 +16,19 @@ spec:
       containers:
       - name: {{ .Chart.Name }}
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
         ports:
-        - containerPort: 80
-        # Don't forget your PVC mount from earlier!
+        - containerPort: 5000 # Matches Flask Logs
+          name: http
         volumeMounts:
         - name: storage-volume
-          mountPath: /data
+          mountPath: {{ .Values.persistence.mountPath }}
       volumes:
       - name: storage-volume
         persistentVolumeClaim:
           claimName: bluegreen-my-helm-charts-ebs-pvc
-
-  # THE STRATEGY BLOCK
   strategy:
-    blueGreen: 
+    blueGreen:
       activeService: bluegreen-active
       previewService: bluegreen-preview
-      autoPromotionEnabled: false # This pauses the rollout so YOU can click 'Promote'
+      autoPromotionEnabled: false

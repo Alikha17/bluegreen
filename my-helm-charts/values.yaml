@@ -1,4 +1,7 @@
 # 1. Global App Settings
+global:
+  appLabel: "my-helm-charts"
+
 replicaCount: 2
 
 image:
@@ -9,48 +12,31 @@ image:
 nameOverride: ""
 fullnameOverride: ""
 
-
-# Add this to your values.yaml
-global:
-  appLabel: "my-helm-charts" 
-# 2. Service Settings (for routing)
+# 2. Service Settings (Routing to Flask on 5000)
 service:
   type: ClusterIP
   port: 80
+  targetPort: 5000
 
-# 3. Ingress Settings (Updated for chippy123.shop)
+# 3. Ingress Settings
 ingress:
   enabled: true
   className: "alb"
   annotations:
-    # This MUST match the group name in your ArgoCD ingress later
     alb.ingress.kubernetes.io/group.name: "chippy-prod-alb"
-    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.io/scheme: internet-facing
     alb.ingress.kubernetes.io/target-type: ip
-    # Replace with your actual ACM ARN
     alb.ingress.kubernetes.io/certificate-arn: "arn:aws:acm:ap-south-1:113461832962:certificate/60d2857a-1d9a-486d-b943-04d8586e170d"
     alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS":443}]'
     alb.ingress.kubernetes.io/ssl-redirect: '443'
+    # CRITICAL: ALB must check port 5000 for Flask
+    alb.ingress.kubernetes.io/healthcheck-port: "5000"
+    alb.ingress.kubernetes.io/healthcheck-path: "/"
   hosts:
     - host: chippy123.shop
       paths:
         - path: /
           pathType: Prefix
-
-# 5. Service Account Settings
-serviceAccount:
-  create: true
-  annotations: {}
-  name: ""
-
-# 6. Gateway API (Fixes httproute.yaml / NOTES.txt errors)
-httpRoute:
-  enabled: false
-
-# 7. Resources & Security (Best practices)
-resources: {}
-autoscaling:
-  enabled: false
 
 persistence:
   enabled: true
