@@ -1,34 +1,32 @@
-apiVersion: argoproj.io/v1alpha1
-kind: Rollout
+apiVersion: networking.k8s.io/v1
+kind: Ingress
 metadata:
-  name: {{ include "my-helm-charts.fullname" . }}
+  name: argocd-ingress
+  namespace: argocd
+  annotations:
+    alb.ingress.kubernetes.io/group.name: "chippy-shared-lb"
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    # Configures both ports and enables SSL redirect
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS":443}]'
+    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:ap-south-1:113461832962:certificate/60d2857a-1d9a-486d-b943-04d8586e170d
+    alb.ingress.kubernetes.io/ssl-redirect: '443'
+    # Use HTTP because the --insecure flag handles the pod-side encryption
+    alb.ingress.kubernetes.io/backend-protocol: HTTP
+    alb.ingress.kubernetes.io/success-codes: "200"
+    alb.ingress.kubernetes.io/healthcheck-protocol: HTTP
+    alb.ingress.kubernetes.io/healthcheck-port: "8080"
+    alb.ingress.kubernetes.io/healthcheck-path: /healthz
 spec:
-  replicas: {{ .Values.replicaCount }}
-  revisionHistoryLimit: 2
-  selector:
-    matchLabels:
-      app: {{ .Values.global.appLabel }}
-  template:
-    metadata:
-      labels:
-        app: {{ .Values.global.appLabel }}
-    spec:
-      containers:
-      - name: {{ .Chart.Name }}
-        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-        imagePullPolicy: {{ .Values.image.pullPolicy }}
-        ports:
-        - containerPort: 5000 # Matches Flask Logs
-          name: http
-        volumeMounts:
-        - name: storage-volume
-          mountPath: {{ .Values.persistence.mountPath }}
-      volumes:
-      - name: storage-volume
-        persistentVolumeClaim:
-          claimName: bluegreen-my-helm-charts-ebs-pvc
-  strategy:
-    blueGreen:
-      activeService: bluegreen-active
-      previewService: bluegreen-preview
-      autoPromotionEnabled: false
+  ingressClassName: alb
+  rules:
+    - host: argocd.chippy123.shop
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: argocd-server
+                port:
+                  number: 80

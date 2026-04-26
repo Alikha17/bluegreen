@@ -7,12 +7,16 @@ metadata:
     alb.ingress.kubernetes.io/group.name: "chippy-shared-lb"
     alb.ingress.kubernetes.io/scheme: internet-facing
     alb.ingress.kubernetes.io/target-type: ip
+    # Listen on both, but we will redirect 80 to 443
     alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS":443}]'
     alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:ap-south-1:113461832962:certificate/60d2857a-1d9a-486d-b943-04d8586e170d
+    alb.ingress.kubernetes.io/ssl-redirect: '443'
+    # Use HTTP because we are using the --insecure flag on the server
     alb.ingress.kubernetes.io/backend-protocol: HTTP
-    alb.ingress.kubernetes.io/success-codes: "200,301,302,307"
+    alb.ingress.kubernetes.io/success-codes: "200"
     alb.ingress.kubernetes.io/healthcheck-protocol: HTTP
     alb.ingress.kubernetes.io/healthcheck-port: "8080"
+    alb.ingress.kubernetes.io/healthcheck-path: /healthz
 spec:
   ingressClassName: alb
   rules:
