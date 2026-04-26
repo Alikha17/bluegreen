@@ -7,11 +7,11 @@ spec:
   revisionHistoryLimit: 2
   selector:
     matchLabels:
-      app: {{ include "my-helm-charts.name" . }}
+      app: {{ .Values.global.appLabel }}
   template:
     metadata:
       labels:
-        app: {{ include "my-helm-charts.name" . }}
+        app: {{ .Values.global.appLabel }}
     spec:
       containers:
       - name: {{ .Chart.Name }}

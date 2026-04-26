@@ -9,6 +9,10 @@ image:
 nameOverride: ""
 fullnameOverride: ""
 
+
+# Add this to your values.yaml
+global:
+  appLabel: "my-helm-charts" 
 # 2. Service Settings (for routing)
 service:
   type: ClusterIP

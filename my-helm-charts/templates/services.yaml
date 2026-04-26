@@ -8,7 +8,7 @@ spec:
   selector:
     # Note: Argo Rollouts will automatically add an additional 
     # 'rollouts-pod-template-hash' label here during a swap.
-    app: {{ include "my-helm-charts.name" . }}
+    app: {{ .Values.global.appLabel }}
   ports:
     - port: 80
       targetPort: 80
@@ -21,7 +21,7 @@ metadata:
 spec:
   type: ClusterIP
   selector:
-    app: {{ include "my-helm-charts.name" . }}
+    app: {{ .Values.global.appLabel }}
   ports:
     - port: 80
       targetPort: 80
