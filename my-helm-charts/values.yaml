@@ -1,4 +1,3 @@
-# 1. Global App Settings
 global:
   appLabel: "my-helm-charts"
 
@@ -6,25 +5,19 @@ replicaCount: 2
 
 image:
   repository: 113461832962.dkr.ecr.ap-south-1.amazonaws.com/bluegreenrepo
-  pullPolicy: IfNotPresent
   tag: "latest"
 
-nameOverride: ""
-fullnameOverride: ""
-
-# 2. ArgoCD Server Fix (CRITICAL: Fixes "Too Many Redirects")
-# This tells ArgoCD to stop trying to handle its own SSL.
+# CRITICAL: Fixes ArgoCD "Too Many Redirects"
 server:
   extraArgs:
     - --insecure
 
-# 3. Service Settings (Routing to Flask on 5000)
 service:
-  type: ClusterIP
   port: 80
   targetPort: 5000
+  # This MUST match the selector in the rollout
+  selector: "my-helm-charts"
 
-# 4. Ingress Settings for chippy123.shop
 ingress:
   enabled: true
   className: "alb"
@@ -32,8 +25,8 @@ ingress:
     alb.ingress.kubernetes.io/group.name: "chippy-shared-lb"
     alb.ingress.kubernetes.io/scheme: internet-facing
     alb.ingress.kubernetes.io/target-type: ip
-    alb.ingress.kubernetes.io/certificate-arn: "arn:aws:acm:ap-south-1:113461832962:certificate/60d2857a-1d9a-486d-b943-04d8586e170d"
     alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS":443}]'
+    alb.ingress.kubernetes.io/certificate-arn: "arn:aws:acm:ap-south-1:113461832962:certificate/60d2857a-1d9a-486d-b943-04d8586e170d"
     alb.ingress.kubernetes.io/ssl-redirect: '443'
     alb.ingress.kubernetes.io/healthcheck-port: "5000"
     alb.ingress.kubernetes.io/healthcheck-path: "/"
@@ -43,9 +36,3 @@ ingress:
       paths:
         - path: /
           pathType: Prefix
-
-persistence:
-  enabled: true
-  mountPath: /data
-  storageClass: ebs-sc
-  size: 1Gi
