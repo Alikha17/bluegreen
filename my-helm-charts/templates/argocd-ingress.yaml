@@ -14,6 +14,7 @@ metadata:
   # This tells the ALB that 307 is a "Healthy" response
   alb.ingress.kubernetes.io/success-codes: "200,301,302,307"
   alb.ingress.kubernetes.io/healthcheck-protocol: HTTPS
+  alb.ingress.kubernetes.io/healthcheck-port: "443"
 spec:
   ingressClassName: alb
   rules:
@@ -26,4 +27,4 @@ spec:
               service:
                 name: argocd-server
                 port:
-                  number: 80
+                  number: 443
