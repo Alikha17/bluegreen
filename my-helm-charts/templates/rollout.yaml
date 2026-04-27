@@ -18,6 +18,15 @@ spec:
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         ports:
         - containerPort: {{ .Values.service.targetPort }}
+
+        resources:   # ✅ REQUIRED for HPA
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+
   strategy:
     blueGreen:
       activeService: bluegreen-active
