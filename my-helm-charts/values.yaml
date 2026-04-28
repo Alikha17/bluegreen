@@ -5,7 +5,7 @@ replicaCount: 2
 
 image:
   repository: 113461832962.dkr.ecr.ap-south-1.amazonaws.com/bluegreenrepo
-  tag: "7722f5e485fdcdcdd04b8f220552207d8f98c34b"
+  tag: "710b48edd0bd44f022375a4e4b13030f86c9e149"
 
 # Added this block to fix the "nil pointer" error
 service:
