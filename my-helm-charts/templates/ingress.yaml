@@ -19,7 +19,8 @@ spec:
             pathType: {{ .pathType }}
             backend:
               service:
-                name: bluegreen-active
+                # Logic: If URL is preview, go to preview service. Else, go to active.
+                name: {{ if eq .host "preview.chippy123.shop" }}bluegreen-preview{{ else }}bluegreen-active{{ end }}
                 port:
                   number: 80
           {{- end }}

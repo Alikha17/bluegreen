@@ -11,13 +11,6 @@ image:
 server:
   extraArgs:
     - --insecure
-
-service:
-  port: 80
-  targetPort: 5000
-  # This MUST match the selector in the rollout
-  selector: "my-helm-charts"
-
 ingress:
   enabled: true
   className: "alb"
@@ -33,6 +26,10 @@ ingress:
     alb.ingress.kubernetes.io/success-codes: "200-399"
   hosts:
     - host: chippy123.shop
+      paths:
+        - path: /
+          pathType: Prefix
+    - host: preview.chippy123.shop
       paths:
         - path: /
           pathType: Prefix

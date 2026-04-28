@@ -5,8 +5,8 @@ on:
     branches: [ "main" ]
 
 permissions:
-  id-token: write # Required for OIDC
-  contents: read
+  id-token: write
+  contents: write  # Changed to write to allow the tag update
 
 jobs:
   build-and-push:
@@ -18,8 +18,7 @@ jobs:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          # CORRECTED: Using ARN format, not the ECR URL
-          role-to-assume: arn:aws:iam::113461832962:role/blue-green 
+          role-to-assume: arn:aws:iam::113461832962:role/blue-green
           aws-region: ap-south-1
 
       - name: Login to Amazon ECR
@@ -27,13 +26,21 @@ jobs:
         uses: aws-actions/amazon-ecr-login@v2
 
       - name: Build, Tag, and Push
+        id: build-image
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          # CORRECTED: Using your actual repo name
           ECR_REPOSITORY: bluegreenrepo
           IMAGE_TAG: ${{ github.sha }}
         run: |
-          # Build and tag with both the unique SHA and 'latest' for ArgoCD
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY:latest .
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+
+      - name: Update Helm Chart Tag
+        run: |
+          # Updates the tag in values.yaml to the unique GitHub SHA
+          sed -i "s/tag: .*/tag: \"${{ github.sha }}\"/" my-helm-charts/values.yaml
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+          git add my-helm-charts/values.yaml
+          git commit -m "Update image tag to ${{ github.sha }} [skip ci]"
+          git push
