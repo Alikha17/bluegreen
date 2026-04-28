@@ -5,8 +5,6 @@ metadata:
   name: bluegreen-active
 spec:
   type: ClusterIP
-  selector:
-    app: {{ .Values.global.appLabel }}
   ports:
     - port: {{ .Values.service.port }}
       targetPort: {{ .Values.service.targetPort }}
@@ -18,8 +16,6 @@ metadata:
   name: bluegreen-preview
 spec:
   type: ClusterIP
-  selector:
-    app: {{ .Values.global.appLabel }}
   ports:
     - port: {{ .Values.service.port }}
       targetPort: {{ .Values.service.targetPort }}
