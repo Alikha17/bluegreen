@@ -10,17 +10,17 @@ metadata:
 spec:
   ingressClassName: {{ .Values.ingress.className }}
   rules:
-    {{- range .Values.ingress.hosts }}
-    - host: {{ .host | quote }}
+    {{- range $host := .Values.ingress.hosts }}
+    - host: {{ $host.host | quote }}
       http:
         paths:
-          {{- range .paths }}
+          {{- range $host.paths }}
           - path: {{ .path }}
             pathType: {{ .pathType }}
             backend:
               service:
-                # Logic: If URL is preview, go to preview service. Else, go to active.
-                name: {{ if eq .host "preview.chippy123.shop" }}bluegreen-preview{{ else }}bluegreen-active{{ end }}
+                # Use the variable $host to check the domain
+                name: {{ if eq $host.host "preview.chippy123.shop" }}bluegreen-preview{{ else }}bluegreen-active{{ end }}
                 port:
                   number: 80
           {{- end }}
