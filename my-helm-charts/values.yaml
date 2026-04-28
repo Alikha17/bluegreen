@@ -7,10 +7,16 @@ image:
   repository: 113461832962.dkr.ecr.ap-south-1.amazonaws.com/bluegreenrepo
   tag: "e2f687e255068fae9f9a239b81eb3a24313880d3"
 
-# CRITICAL: Fixes ArgoCD "Too Many Redirects"
+# Added this block to fix the "nil pointer" error
+service:
+  port: 80
+  targetPort: 5000
+  selector: "my-helm-charts"
+
 server:
   extraArgs:
     - --insecure
+
 ingress:
   enabled: true
   className: "alb"
